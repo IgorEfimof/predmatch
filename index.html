@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         :root {
             --primary: #E53935;
@@ -9,6 +11,12 @@
             --bg: #f5f7fa;
             --card: #ffffff;
             --text: #2c3e50;
+        }
+        html {
+            touch-action: manipulation;
+            -webkit-text-size-adjust: 100%;
+            height: 100%;
+            overflow: hidden;
         }
         body {
             font-family: 'Segoe UI', Roboto, sans-serif;
@@ -19,8 +27,8 @@
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
-            height: 100vh;
-            overflow: hidden;
+            height: 100%;
+            touch-action: pan-y;
         }
         .container {
             max-width: 600px;
@@ -30,6 +38,7 @@
             flex-direction: column;
             background: var(--card);
             border: 1px solid #ddd;
+            transform-origin: top center;
         }
         .header {
             background: var(--primary);
@@ -71,6 +80,7 @@
             padding: 10px;
             flex: 1;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .input-group {
             margin-bottom: 10px;
@@ -231,16 +241,19 @@
             <div class="results" id="results" style="display: none;">
                 <h3>Результаты анализа</h3>
                 <div class="result-item">
-                    <strong>Маржа букмекера:</strong> <span id="bookmaker-margin">5.8%</span>
+                    <strong>Маржа букмекера (П1/П2):</strong> <span id="bookmaker-margin">-</span>
                 </div>
                 <div class="result-item">
-                    <strong>Value ставка:</strong> <span id="value-bet">П2 (Value 1.12)</span>
+                    <strong>Маржа тотала:</strong> <span id="total-margin">-</span>
                 </div>
                 <div class="result-item">
-                    <strong>Рекомендуемый рынок:</strong> <span id="recommended-market">Тотал >18.5</span>
+                    <strong>Маржа форы:</strong> <span id="handicap-margin">-</span>
                 </div>
                 <div class="result-item">
-                    <strong>Ожидаемая ROI:</strong> <span id="expected-roi">+7.4%</span>
+                    <strong>Value ставка:</strong> <span id="value-bet">-</span>
+                </div>
+                <div class="result-item">
+                    <strong>Рекомендуемый рынок:</strong> <span id="recommended-market">-</span>
                 </div>
             </div>
         </div>
@@ -265,6 +278,15 @@
     </div>
 
     <script>
+        // Защита от масштабирования
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+
         // Система активного ввода
         const inputs = document.querySelectorAll('.custom-input');
         let activeInput = null;
@@ -319,38 +341,70 @@
             }
         });
         
-        // Алгоритм анализа
+        // Реальный расчет всех показателей
         document.getElementById('calculate-btn').addEventListener('click', function() {
+            // Получаем все коэффициенты
             const oddsP1 = parseFloat(document.getElementById('odds-p1').value) || 0;
             const oddsP2 = parseFloat(document.getElementById('odds-p2').value) || 0;
-            
+            const totalOver = parseFloat(document.getElementById('total-over').value) || 0;
+            const totalUnder = parseFloat(document.getElementById('total-under').value) || 0;
+            const handicapP1 = parseFloat(document.getElementById('handicap-p1').value) || 0;
+            const handicapP2 = parseFloat(document.getElementById('handicap-p2').value) || 0;
+
             if (oddsP1 === 0 || oddsP2 === 0) {
                 alert("Введите коэффициенты на обоих игроков!");
                 return;
             }
+
+            // 1. Расчет маржи для всех рынков
+            const calculateMargin = (k1, k2) => ((1/k1 + 1/k2) - 1) * 100;
             
-            const margin = ((1 / oddsP1 + 1 / oddsP2) - 1) * 100;
-            
-            let valueBet = "";
-            if (oddsP1 < oddsP2) {
-                const value = (1 / oddsP1) / (1 / oddsP1 + 1 / oddsP2);
-                valueBet = `П1 (Value ${(value * 1.1).toFixed(2)})`;
-            } else {
-                const value = (1 / oddsP2) / (1 / oddsP1 + 1 / oddsP2);
-                valueBet = `П2 (Value ${(value * 1.1).toFixed(2)})`;
-            }
-            
-            document.getElementById('bookmaker-margin').textContent = margin.toFixed(1) + '%';
+            const marginMain = calculateMargin(oddsP1, oddsP2).toFixed(1);
+            const marginTotal = totalOver > 0 && totalUnder > 0 ? calculateMargin(totalOver, totalUnder).toFixed(1) : "-";
+            const marginHandicap = handicapP1 > 0 && handicapP2 > 0 ? calculateMargin(handicapP1, handicapP2).toFixed(1) : "-";
+
+            // 2. Определение value-ставки
+            const getValueBet = (k1, k2) => {
+                const prob1 = 1 / k1;
+                const prob2 = 1 / k2;
+                const totalProb = prob1 + prob2;
+                return k1 < k2 ? 
+                    `П1 (Value ${(prob1 / totalProb * 1.1).toFixed(2)})` : 
+                    `П2 (Value ${(prob2 / totalProb * 1.1).toFixed(2)})`;
+            };
+
+            const valueBet = getValueBet(oddsP1, oddsP2);
+
+            // 3. Рекомендация рынка (наименьшая маржа)
+            const margins = [
+                { name: "П1/П2", value: marginMain },
+                { name: "Тотал", value: marginTotal },
+                { name: "Фора", value: marginHandicap }
+            ].filter(m => m.value !== "-");
+
+            const bestMarket = margins.reduce((min, curr) => 
+                parseFloat(curr.value) < parseFloat(min.value) ? curr : min
+            );
+
+            // 4. Обновление результатов
+            document.getElementById('bookmaker-margin').textContent = marginMain + '%';
+            document.getElementById('total-margin').textContent = 
+                marginTotal !== "-" ? marginTotal + '%' : "-";
+            document.getElementById('handicap-margin').textContent = 
+                marginHandicap !== "-" ? marginHandicap + '%' : "-";
             document.getElementById('value-bet').textContent = valueBet;
+            document.getElementById('recommended-market').textContent = 
+                bestMarket ? `${bestMarket.name} (маржа ${bestMarket.value}%)` : "Недостаточно данных";
+
             document.getElementById('results').style.display = 'block';
         });
 
-        // Кнопка очистки в заголовке
+        // Кнопка очистки
         document.getElementById('clear-btn').addEventListener('click', function() {
             location.reload();
         });
 
-        // Кнопка сброса (очищает поля без перезагрузки)
+        // Кнопка сброса
         document.getElementById('reset-btn').addEventListener('click', function() {
             inputs.forEach(input => input.value = '');
             document.getElementById('results').style.display = 'none';
