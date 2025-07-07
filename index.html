@@ -185,6 +185,8 @@
             padding: 10px;
             background: #f0f0f0;
             border-top: 1px solid #ddd;
+            position: sticky;
+            bottom: 0;
         }
         .key {
             background: white;
@@ -220,6 +222,15 @@
         }
         .analysis-table tr:hover {
             background-color: #f5f5f5;
+        }
+        .value-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            background-color: var(--positive);
+            color: white;
         }
     </style>
 </head>
@@ -302,11 +313,11 @@
                     <span id="bookmaker-margin" class="result-value">-</span>
                 </div>
                 <div class="result-item">
-                    <strong>Лучший Value (>2.0):</strong> 
+                    <strong>Лучшая Value-ставка:</strong> 
                     <span id="best-value" class="result-value">-</span>
                 </div>
                 <div class="result-item">
-                    <strong>Перекрестный анализ:</strong>
+                    <strong>Перекрестный анализ тоталов:</strong>
                     <table class="analysis-table" id="cross-analysis">
                         <!-- Данные будут добавлены через JS -->
                     </table>
@@ -327,7 +338,7 @@
             <div class="key">8</div>
             <div class="key">9</div>
             <div class="key">0</div>
-            <div class="key-enter">Готово</div>
+            <div class="key-enter" id="done-btn">Готово</div>
         </div>
     </div>
 
@@ -348,6 +359,11 @@
                 activeInput = this;
                 this.classList.add('active');
                 document.getElementById('keyboard').style.display = 'grid';
+                
+                // Прокручиваем к активному полю
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
             });
         });
 
@@ -359,57 +375,107 @@
                 
                 if (action === '⌫') {
                     activeInput.value = activeInput.value.slice(0, -1);
-                } else if (action === 'Готово') {
-                    activeInput.classList.remove('active');
-                    activeInput = null;
-                    document.getElementById('keyboard').style.display = 'none';
                 } else {
                     activeInput.value += action;
                 }
             });
         });
 
-        // Функция перекрестного анализа
-        function getCrossAnalysis() {
-            const totals = ['17.5', '18.5', '19.5', '20.5'].map(t => ({
-                value: t,
-                over: parseFloat(document.getElementById(`total-over-${t}`).value) || 0,
-                under: parseFloat(document.getElementById(`total-under-${t}`).value) || 0
-            }));
+        // Кнопка "Готово"
+        document.getElementById('done-btn').addEventListener('click', function() {
+            if (activeInput) {
+                activeInput.classList.remove('active');
+                activeInput = null;
+            }
+            document.getElementById('keyboard').style.display = 'none';
+        });
+
+        // Функция перекрестного анализа тоталов
+        function analyzeCrossTotals() {
+            const totals = {
+                '17.5': {
+                    over: parseFloat(document.getElementById('total-over-17.5').value) || 0,
+                    under: parseFloat(document.getElementById('total-under-17.5').value) || 0
+                },
+                '18.5': {
+                    over: parseFloat(document.getElementById('total-over-18.5').value) || 0,
+                    under: parseFloat(document.getElementById('total-under-18.5').value) || 0
+                },
+                '19.5': {
+                    over: parseFloat(document.getElementById('total-over-19.5').value) || 0,
+                    under: parseFloat(document.getElementById('total-under-19.5').value) || 0
+                },
+                '20.5': {
+                    over: parseFloat(document.getElementById('total-over-20.5').value) || 0,
+                    under: parseFloat(document.getElementById('total-under-20.5').value) || 0
+                }
+            };
 
             const analysis = [];
             
-            // Анализ смежных тоталов
-            for (let i = 0; i < totals.length - 1; i++) {
-                const current = totals[i];
-                const next = totals[i + 1];
-                
-                // Меньше текущий vs Больше следующий (например, Меньше 18.5 vs Больше 17.5)
-                if (current.under > 0 && next.over > 0) {
-                    const diff = current.under - next.over;
-                    const value = diff > 0 ? (diff / next.over * 100).toFixed(1) + '%' : '0%';
+            // Анализ расхождений между смежными тоталами
+            const pairs = [
+                ['17.5', '18.5'],
+                ['18.5', '19.5'],
+                ['19.5', '20.5']
+            ];
+
+            pairs.forEach(([lower, higher]) => {
+                // Меньше высший vs Больше низший (например, Меньше 18.5 vs Больше 17.5)
+                if (totals[higher].under > 0 && totals[lower].over > 0) {
+                    const diff = totals[higher].under - totals[lower].over;
+                    const value = (diff / totals[lower].over * 100).toFixed(1);
                     analysis.push({
-                        type: `Меньше ${current.value} vs Больше ${next.value}`,
-                        odds: [current.under, next.over],
+                        type: `Меньше ${higher} vs Больше ${lower}`,
+                        odds: [totals[higher].under, totals[lower].over],
                         discrepancy: diff.toFixed(2),
                         value: value
                     });
                 }
                 
-                // Больше текущий vs Меньше следующий (например, Больше 18.5 vs Меньше 19.5)
-                if (current.over > 0 && next.under > 0) {
-                    const diff = current.over - next.under;
-                    const value = diff > 0 ? (diff / next.under * 100).toFixed(1) + '%' : '0%';
+                // Больше высший vs Меньше низший (например, Больше 18.5 vs Меньше 17.5)
+                if (totals[higher].over > 0 && totals[lower].under > 0) {
+                    const diff = totals[higher].over - totals[lower].under;
+                    const value = (diff / totals[lower].under * 100).toFixed(1);
                     analysis.push({
-                        type: `Больше ${current.value} vs Меньше ${next.value}`,
-                        odds: [current.over, next.under],
+                        type: `Больше ${higher} vs Меньше ${lower}`,
+                        odds: [totals[higher].over, totals[lower].under],
                         discrepancy: diff.toFixed(2),
                         value: value
                     });
                 }
-            }
+            });
             
             return analysis.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
+        }
+
+        // Функция поиска лучшей value-ставки
+        function findBestValueBet() {
+            const markets = [
+                { name: "П1", value: parseFloat(document.getElementById('odds-p1').value) || 0 },
+                { name: "П2", value: parseFloat(document.getElementById('odds-p2').value) || 0 },
+                { name: "Тотал >17.5", value: parseFloat(document.getElementById('total-over-17.5').value) || 0 },
+                { name: "Тотал <17.5", value: parseFloat(document.getElementById('total-under-17.5').value) || 0 },
+                { name: "Тотал >18.5", value: parseFloat(document.getElementById('total-over-18.5').value) || 0 },
+                { name: "Тотал <18.5", value: parseFloat(document.getElementById('total-under-18.5').value) || 0 },
+                { name: "Тотал >19.5", value: parseFloat(document.getElementById('total-over-19.5').value) || 0 },
+                { name: "Тотал <19.5", value: parseFloat(document.getElementById('total-under-19.5').value) || 0 },
+                { name: "Тотал >20.5", value: parseFloat(document.getElementById('total-over-20.5').value) || 0 },
+                { name: "Тотал <20.5", value: parseFloat(document.getElementById('total-under-20.5').value) || 0 },
+                { name: "Фора П1 -1.5", value: parseFloat(document.getElementById('handicap-p1').value) || 0 },
+                { name: "Фора П2 +1.5", value: parseFloat(document.getElementById('handicap-p2').value) || 0 }
+            ];
+
+            // Фильтруем ставки с коэффициентом ≥ 2.0
+            const highOdds = markets.filter(m => m.value >= 2.0);
+            
+            // Если нет высоких коэффициентов, берем все
+            const candidates = highOdds.length > 0 ? highOdds : markets;
+            
+            // Сортируем по value (чем выше коэффициент при прочих равных)
+            candidates.sort((a, b) => (b.value - a.value));
+            
+            return candidates[0] || null;
         }
 
         // Полный анализ
@@ -418,54 +484,57 @@
             const oddsP2 = parseFloat(document.getElementById('odds-p2').value) || 0;
             
             if (!oddsP1 || !oddsP2) {
-                alert("Введите коэффициенты на обоих игроков!");
+                alert("Введите коэффициенты П1 и П2!");
                 return;
             }
 
             // 1. Расчет маржи
             const margin = ((1/oddsP1 + 1/oddsP2 - 1) * 100).toFixed(1) + '%';
             
-            // 2. Перекрестный анализ
-            const crossAnalysis = getCrossAnalysis();
-            const bestValue = crossAnalysis.find(item => 
-                item.odds[0] >= 2.0 || item.odds[1] >= 2.0) || null;
+            // 2. Перекрестный анализ тоталов
+            const crossAnalysis = analyzeCrossTotals();
             
-            // 3. Обновление результатов
+            // 3. Поиск лучшей value-ставки
+            const bestBet = findBestValueBet();
+            
+            // 4. Обновление результатов
             document.getElementById('bookmaker-margin').textContent = margin;
             
-            if (bestValue) {
-                const bestOdd = bestValue.odds[0] >= bestValue.odds[1] ? 
-                    `${bestValue.type.split(' vs ')[0]} @ ${bestValue.odds[0].toFixed(2)}` : 
-                    `${bestValue.type.split(' vs ')[1]} @ ${bestValue.odds[1].toFixed(2)}`;
-                
-                document.getElementById('best-value').textContent = 
-                    `${bestOdd} (выгода ${bestValue.value})`;
+            if (bestBet) {
+                const valuePercent = ((bestBet.value - 1) * 100).toFixed(1) + '%';
+                document.getElementById('best-value').innerHTML = 
+                    `${bestBet.name} @ <strong>${bestBet.value.toFixed(2)}</strong> <span class="value-badge">value ${valuePercent}</span>`;
             } else {
-                document.getElementById('best-value').textContent = "Нет value-ставок (>2.0)";
+                document.getElementById('best-value').textContent = "Нет подходящих ставок";
             }
             
-            // Заполняем таблицу анализа
+            // Заполняем таблицу перекрестного анализа
             const table = document.getElementById('cross-analysis');
             table.innerHTML = `
                 <tr>
                     <th>Сравнение</th>
-                    <th>Коэф 1</th>
-                    <th>Коэф 2</th>
-                    <th>Расхождение</th>
+                    <th>Коэф1</th>
+                    <th>Коэф2</th>
+                    <th>Разница</th>
                     <th>Выгода</th>
                 </tr>
                 ${crossAnalysis.map(item => `
-                <tr ${(item.odds[0] >= 2.0 || item.odds[1] >= 2.0) ? 'style="background:#f0fff0"' : ''}>
+                <tr ${(item.odds[0] >= 2.0 || item.odds[1] >= 2.0) ? 'style="background:#f8fff8"' : ''}>
                     <td>${item.type}</td>
                     <td>${item.odds[0].toFixed(2)}</td>
                     <td>${item.odds[1].toFixed(2)}</td>
                     <td>${item.discrepancy}</td>
-                    <td>${item.value}</td>
+                    <td>${item.value}%</td>
                 </tr>
                 `).join('')}
             `;
             
             document.getElementById('results').style.display = 'block';
+            
+            // Прокручиваем к результатам
+            setTimeout(() => {
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
         });
 
         // Кнопки сброса
