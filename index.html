@@ -232,6 +232,33 @@
             background-color: var(--positive);
             color: white;
         }
+        .direction-indicator {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 18px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        .direction-over {
+            background-color: var(--positive);
+            color: white;
+        }
+        .direction-under {
+            background-color: var(--negative);
+            color: white;
+        }
+        .comparison-cell {
+            display: flex;
+            align-items: center;
+        }
+        .comparison-type {
+            font-size: 11px;
+            color: #666;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -421,27 +448,43 @@
             ];
 
             pairs.forEach(([lower, higher]) => {
-                // Меньше высший vs Больше низший (например, Меньше 18.5 vs Больше 17.5)
+                // Меньше высший vs Больше низший
                 if (totals[higher].under > 0 && totals[lower].over > 0) {
                     const diff = totals[higher].under - totals[lower].over;
-                    const value = (diff / totals[lower].over * 100).toFixed(1);
                     analysis.push({
-                        type: `Меньше ${higher} vs Больше ${lower}`,
-                        odds: [totals[higher].under, totals[lower].over],
+                        comparison: `${higher} vs ${lower}`,
+                        bet1: { 
+                            type: "under", 
+                            value: totals[higher].under,
+                            desc: `Меньше ${higher}`
+                        },
+                        bet2: { 
+                            type: "over", 
+                            value: totals[lower].over,
+                            desc: `Больше ${lower}`
+                        },
                         discrepancy: diff.toFixed(2),
-                        value: value
+                        value: (diff / totals[lower].over * 100).toFixed(1)
                     });
                 }
                 
-                // Больше высший vs Меньше низший (например, Больше 18.5 vs Меньше 17.5)
+                // Больше высший vs Меньше низший
                 if (totals[higher].over > 0 && totals[lower].under > 0) {
                     const diff = totals[higher].over - totals[lower].under;
-                    const value = (diff / totals[lower].under * 100).toFixed(1);
                     analysis.push({
-                        type: `Больше ${higher} vs Меньше ${lower}`,
-                        odds: [totals[higher].over, totals[lower].under],
+                        comparison: `${higher} vs ${lower}`,
+                        bet1: { 
+                            type: "over", 
+                            value: totals[higher].over,
+                            desc: `Больше ${higher}`
+                        },
+                        bet2: { 
+                            type: "under", 
+                            value: totals[lower].under,
+                            desc: `Меньше ${lower}`
+                        },
                         discrepancy: diff.toFixed(2),
-                        value: value
+                        value: (diff / totals[lower].under * 100).toFixed(1)
                     });
                 }
             });
@@ -513,16 +556,28 @@
             table.innerHTML = `
                 <tr>
                     <th>Сравнение</th>
-                    <th>Коэф1</th>
-                    <th>Коэф2</th>
+                    <th>Ставка 1</th>
+                    <th>Ставка 2</th>
                     <th>Разница</th>
                     <th>Выгода</th>
                 </tr>
                 ${crossAnalysis.map(item => `
-                <tr ${(item.odds[0] >= 2.0 || item.odds[1] >= 2.0) ? 'style="background:#f8fff8"' : ''}>
-                    <td>${item.type}</td>
-                    <td>${item.odds[0].toFixed(2)}</td>
-                    <td>${item.odds[1].toFixed(2)}</td>
+                <tr ${(item.bet1.value >= 2.0 || item.bet2.value >= 2.0) ? 'style="background:#f8fff8"' : ''}>
+                    <td>${item.comparison}</td>
+                    <td class="comparison-cell">
+                        <span class="direction-indicator ${item.bet1.type === 'over' ? 'direction-over' : 'direction-under'}">
+                            ${item.bet1.type === 'over' ? '>' : '<'}
+                        </span>
+                        ${item.bet1.value.toFixed(2)}
+                        <span class="comparison-type">${item.bet1.desc}</span>
+                    </td>
+                    <td class="comparison-cell">
+                        <span class="direction-indicator ${item.bet2.type === 'over' ? 'direction-over' : 'direction-under'}">
+                            ${item.bet2.type === 'over' ? '>' : '<'}
+                        </span>
+                        ${item.bet2.value.toFixed(2)}
+                        <span class="comparison-type">${item.bet2.desc}</span>
+                    </td>
                     <td>${item.discrepancy}</td>
                     <td>${item.value}%</td>
                 </tr>
