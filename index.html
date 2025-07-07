@@ -11,6 +11,8 @@
             --card: #ffffff;
             --text: #2c3e50;
             --highlight: #FFF9C4;
+            --positive: #4CAF50;
+            --negative: #F44336;
         }
         * {
             box-sizing: border-box;
@@ -24,7 +26,7 @@
             -webkit-text-size-adjust: 100%;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
             -webkit-touch-callout: none;
@@ -41,225 +43,274 @@
         .header {
             background: var(--primary);
             color: white;
-            padding: 8px 10px;
-            font-size: 15px;
+            padding: 12px 15px;
             text-align: center;
+            font-weight: 600;
+            font-size: 17px;
             position: relative;
         }
         .clear-btn {
             position: absolute;
-            right: 8px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
-            background: none;
+            background: rgba(255,255,255,0.2);
             border: none;
             color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
             font-size: 13px;
+            cursor: pointer;
         }
         .match-info {
             background: var(--secondary);
-            padding: 6px 10px;
-            color: white;
-            font-size: 13px;
+            padding: 10px 15px;
+        }
+        .match-teams {
             display: flex;
             justify-content: space-between;
+            color: white;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .match-details {
+            background: #FFCDD2;
+            color: #B71C1C;
+            text-align: center;
+            padding: 6px;
+            font-size: 13px;
+            border-radius: 4px;
         }
         .input-section {
-            padding: 8px 10px;
+            padding: 12px;
             flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .input-group {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
         .input-group label {
-            font-size: 13px;
             display: block;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
         }
         .custom-input {
             width: 100%;
-            padding: 8px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 15px;
             background: #f9f9f9;
+            caret-color: transparent;
         }
-        details {
-            margin-bottom: 6px;
-            border: 1px solid #eee;
-            border-radius: 5px;
-            overflow: hidden;
+        .custom-input:focus {
+            outline: none;
+            border: 2px solid var(--primary);
+            background: var(--highlight);
         }
-        summary {
-            padding: 6px 8px;
-            background: #f5f5f5;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        summary::after {
-            content: "▼";
-            font-size: 10px;
-            transition: transform 0.2s;
-        }
-        details[open] summary::after {
-            transform: rotate(180deg);
+        .markets-container {
+            margin: 15px 0;
         }
         .markets-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            padding: 6px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
         .market-card {
-            padding: 6px;
+            background: var(--card);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             border: 1px solid #eee;
-            border-radius: 5px;
-            font-size: 12px;
+        }
+        .market-card.highlight {
+            background-color: var(--highlight);
+            border-color: var(--primary);
         }
         .market-name {
             text-align: center;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 13px;
             color: #666;
         }
         .btn-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin: 6px 0;
+            gap: 10px;
+            margin: 15px 0;
         }
         .btn {
-            padding: 8px;
+            padding: 12px;
             border: none;
-            border-radius: 4px;
-            font-size: 13px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
             background: var(--primary);
             color: white;
+            cursor: pointer;
         }
         .btn-secondary {
             background: #757575;
         }
         .results {
-            margin-top: 6px;
-            padding: 8px;
-            background: #f0f0f0;
-            border-radius: 5px;
-            font-size: 12px;
-            display: none;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            border-left: 4px solid var(--primary);
         }
         .result-item {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .result-value {
+            font-weight: 600;
+        }
+        .positive {
+            color: var(--positive);
+        }
+        .negative {
+            color: var(--negative);
         }
         .keyboard {
             display: none;
             grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-            padding: 6px;
-            background: #f5f5f5;
+            gap: 5px;
+            padding: 10px;
+            background: #f0f0f0;
             border-top: 1px solid #ddd;
         }
         .key {
-            padding: 8px;
             background: white;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 16px;
             text-align: center;
-            font-size: 14px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
         .key-enter {
             background: var(--primary);
             color: white;
             grid-column: span 2;
         }
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin: 15px 0 10px;
+            color: var(--primary);
+        }
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .analysis-table th, .analysis-table td {
+            padding: 6px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .analysis-table tr:hover {
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            Анализатор ставок
+            Анализатор ставок TT
             <button class="clear-btn" id="clear-btn">Сброс</button>
         </div>
         
         <div class="match-info">
-            <span>Игрок 1</span>
-            <span>Игрок 2</span>
+            <div class="match-teams">
+                <span>Тим Болл</span>
+                <span>Спин Мастер</span>
+            </div>
+            <div class="match-details">
+                Матч до 4 побед • 07.05.2023 • 19:00
+            </div>
         </div>
         
         <div class="input-section">
             <div class="input-group">
-                <label>Коэф. П1:</label>
+                <label>Коэффициент на П1:</label>
                 <input type="text" class="custom-input" id="odds-p1" placeholder="1.85" inputmode="none">
             </div>
             <div class="input-group">
-                <label>Коэф. П2:</label>
+                <label>Коэффициент на П2:</label>
                 <input type="text" class="custom-input" id="odds-p2" placeholder="2.05" inputmode="none">
             </div>
             
-            <details>
-                <summary>Основные тоталы (3)</summary>
+            <div class="section-title">Основные рынки</div>
+            <div class="markets-container">
                 <div class="markets-grid">
-                    <div class="market-card">
+                    <div class="market-card" id="total-17.5">
                         <div class="market-name">Тотал 17.5</div>
                         <input type="text" class="custom-input" id="total-over-17.5" placeholder="1.80" inputmode="none">
                         <input type="text" class="custom-input" id="total-under-17.5" placeholder="2.00" inputmode="none">
                     </div>
-                    <div class="market-card">
+                    <div class="market-card" id="total-18.5">
                         <div class="market-name">Тотал 18.5</div>
                         <input type="text" class="custom-input" id="total-over-18.5" placeholder="1.90" inputmode="none">
                         <input type="text" class="custom-input" id="total-under-18.5" placeholder="1.90" inputmode="none">
                     </div>
-                    <div class="market-card">
+                </div>
+                
+                <div class="markets-grid">
+                    <div class="market-card" id="total-19.5">
                         <div class="market-name">Тотал 19.5</div>
                         <input type="text" class="custom-input" id="total-over-19.5" placeholder="2.10" inputmode="none">
                         <input type="text" class="custom-input" id="total-under-19.5" placeholder="1.75" inputmode="none">
                     </div>
-                </div>
-            </details>
-            
-            <details>
-                <summary>Доп. тоталы (2)</summary>
-                <div class="markets-grid">
-                    <div class="market-card">
+                    <div class="market-card" id="total-20.5">
                         <div class="market-name">Тотал 20.5</div>
                         <input type="text" class="custom-input" id="total-over-20.5" placeholder="2.30" inputmode="none">
                         <input type="text" class="custom-input" id="total-under-20.5" placeholder="1.65" inputmode="none">
                     </div>
-                    <div class="market-card">
-                        <div class="market-name">Тотал 21.5</div>
-                        <input type="text" class="custom-input" id="total-over-21.5" placeholder="2.50" inputmode="none">
-                        <input type="text" class="custom-input" id="total-under-21.5" placeholder="1.55" inputmode="none">
-                    </div>
                 </div>
-            </details>
+            </div>
             
-            <details>
-                <summary>Форы (2)</summary>
-                <div class="markets-grid">
-                    <div class="market-card">
-                        <div class="market-name">Фора П1 -1.5</div>
-                        <input type="text" class="custom-input" id="handicap-p1" placeholder="2.25" inputmode="none">
-                    </div>
-                    <div class="market-card">
-                        <div class="market-name">Фора П2 +1.5</div>
-                        <input type="text" class="custom-input" id="handicap-p2" placeholder="1.65" inputmode="none">
-                    </div>
+            <div class="section-title">Форы</div>
+            <div class="markets-grid">
+                <div class="market-card">
+                    <div class="market-name">Фора П1 (-1.5)</div>
+                    <input type="text" class="custom-input" id="handicap-p1" placeholder="2.25" inputmode="none">
                 </div>
-            </details>
+                <div class="market-card">
+                    <div class="market-name">Фора П2 (+1.5)</div>
+                    <input type="text" class="custom-input" id="handicap-p2" placeholder="1.65" inputmode="none">
+                </div>
+            </div>
             
             <div class="btn-group">
-                <button class="btn" id="calculate-btn">Анализ</button>
+                <button class="btn" id="calculate-btn">Анализировать</button>
                 <button class="btn btn-secondary" id="reset-btn">Очистить</button>
             </div>
             
-            <div class="results" id="results">
-                <div class="result-item">Маржа: <span id="margin-value">-</span></div>
-                <div class="result-item">Лучший коэф (>2.0): <span id="best-odd">-</span></div>
-                <div class="result-item">Рекомендация: <span id="recommendation">-</span></div>
+            <div class="results" id="results" style="display: none;">
+                <div class="result-item">
+                    <strong>Маржа букмекера:</strong> 
+                    <span id="bookmaker-margin" class="result-value">-</span>
+                </div>
+                <div class="result-item">
+                    <strong>Лучший Value (>2.0):</strong> 
+                    <span id="best-value" class="result-value">-</span>
+                </div>
+                <div class="result-item">
+                    <strong>Перекрестный анализ:</strong>
+                    <table class="analysis-table" id="cross-analysis">
+                        <!-- Данные будут добавлены через JS -->
+                    </table>
+                </div>
             </div>
         </div>
         
@@ -318,47 +369,101 @@
             });
         });
 
-        // Анализ ставок
+        // Функция перекрестного анализа
+        function getCrossAnalysis() {
+            const totals = ['17.5', '18.5', '19.5', '20.5'].map(t => ({
+                value: t,
+                over: parseFloat(document.getElementById(`total-over-${t}`).value) || 0,
+                under: parseFloat(document.getElementById(`total-under-${t}`).value) || 0
+            }));
+
+            const analysis = [];
+            
+            // Анализ смежных тоталов
+            for (let i = 0; i < totals.length - 1; i++) {
+                const current = totals[i];
+                const next = totals[i + 1];
+                
+                // Меньше текущий vs Больше следующий (например, Меньше 18.5 vs Больше 17.5)
+                if (current.under > 0 && next.over > 0) {
+                    const diff = current.under - next.over;
+                    const value = diff > 0 ? (diff / next.over * 100).toFixed(1) + '%' : '0%';
+                    analysis.push({
+                        type: `Меньше ${current.value} vs Больше ${next.value}`,
+                        odds: [current.under, next.over],
+                        discrepancy: diff.toFixed(2),
+                        value: value
+                    });
+                }
+                
+                // Больше текущий vs Меньше следующий (например, Больше 18.5 vs Меньше 19.5)
+                if (current.over > 0 && next.under > 0) {
+                    const diff = current.over - next.under;
+                    const value = diff > 0 ? (diff / next.under * 100).toFixed(1) + '%' : '0%';
+                    analysis.push({
+                        type: `Больше ${current.value} vs Меньше ${next.value}`,
+                        odds: [current.over, next.under],
+                        discrepancy: diff.toFixed(2),
+                        value: value
+                    });
+                }
+            }
+            
+            return analysis.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
+        }
+
+        // Полный анализ
         document.getElementById('calculate-btn').addEventListener('click', function() {
-            // Основные коэффициенты
             const oddsP1 = parseFloat(document.getElementById('odds-p1').value) || 0;
             const oddsP2 = parseFloat(document.getElementById('odds-p2').value) || 0;
             
             if (!oddsP1 || !oddsP2) {
-                alert("Введите коэффициенты П1 и П2");
+                alert("Введите коэффициенты на обоих игроков!");
                 return;
             }
 
-            // Сбор всех коэффициентов
-            const allMarkets = [
-                {name: "П1", value: oddsP1},
-                {name: "П2", value: oddsP2},
-                {name: "Тотал >17.5", value: parseFloat(document.getElementById('total-over-17.5').value) || 0},
-                {name: "Тотал <17.5", value: parseFloat(document.getElementById('total-under-17.5').value) || 0},
-                {name: "Тотал >18.5", value: parseFloat(document.getElementById('total-over-18.5').value) || 0},
-                {name: "Тотал <18.5", value: parseFloat(document.getElementById('total-under-18.5').value) || 0},
-                {name: "Тотал >19.5", value: parseFloat(document.getElementById('total-over-19.5').value) || 0},
-                {name: "Тотал <19.5", value: parseFloat(document.getElementById('total-under-19.5').value) || 0},
-                {name: "Тотал >20.5", value: parseFloat(document.getElementById('total-over-20.5').value) || 0},
-                {name: "Тотал <20.5", value: parseFloat(document.getElementById('total-under-20.5').value) || 0},
-                {name: "Фора П1 -1.5", value: parseFloat(document.getElementById('handicap-p1').value) || 0},
-                {name: "Фора П2 +1.5", value: parseFloat(document.getElementById('handicap-p2').value) || 0}
-            ];
-
-            // 1. Расчет маржи для П1/П2
-            const margin = ((1/oddsP1 + 1/oddsP2 - 1) * 100).toFixed(1);
+            // 1. Расчет маржи
+            const margin = ((1/oddsP1 + 1/oddsP2 - 1) * 100).toFixed(1) + '%';
             
-            // 2. Поиск лучшего коэффициента (>2.0)
-            const highOdds = allMarkets.filter(m => m.value >= 2.0);
-            const bestOdd = highOdds.reduce((max, curr) => 
-                curr.value > max.value ? curr : max, {value: 0});
-
+            // 2. Перекрестный анализ
+            const crossAnalysis = getCrossAnalysis();
+            const bestValue = crossAnalysis.find(item => 
+                item.odds[0] >= 2.0 || item.odds[1] >= 2.0) || null;
+            
             // 3. Обновление результатов
-            document.getElementById('margin-value').textContent = margin + '%';
-            document.getElementById('best-odd').textContent = 
-                bestOdd.value ? `${bestOdd.name} @ ${bestOdd.value.toFixed(2)}` : 'Нет >2.0';
-            document.getElementById('recommendation').textContent = 
-                bestOdd.value ? `Ставка на ${bestOdd.name}` : 'Нет value-ставок';
+            document.getElementById('bookmaker-margin').textContent = margin;
+            
+            if (bestValue) {
+                const bestOdd = bestValue.odds[0] >= bestValue.odds[1] ? 
+                    `${bestValue.type.split(' vs ')[0]} @ ${bestValue.odds[0].toFixed(2)}` : 
+                    `${bestValue.type.split(' vs ')[1]} @ ${bestValue.odds[1].toFixed(2)}`;
+                
+                document.getElementById('best-value').textContent = 
+                    `${bestOdd} (выгода ${bestValue.value})`;
+            } else {
+                document.getElementById('best-value').textContent = "Нет value-ставок (>2.0)";
+            }
+            
+            // Заполняем таблицу анализа
+            const table = document.getElementById('cross-analysis');
+            table.innerHTML = `
+                <tr>
+                    <th>Сравнение</th>
+                    <th>Коэф 1</th>
+                    <th>Коэф 2</th>
+                    <th>Расхождение</th>
+                    <th>Выгода</th>
+                </tr>
+                ${crossAnalysis.map(item => `
+                <tr ${(item.odds[0] >= 2.0 || item.odds[1] >= 2.0) ? 'style="background:#f0fff0"' : ''}>
+                    <td>${item.type}</td>
+                    <td>${item.odds[0].toFixed(2)}</td>
+                    <td>${item.odds[1].toFixed(2)}</td>
+                    <td>${item.discrepancy}</td>
+                    <td>${item.value}</td>
+                </tr>
+                `).join('')}
+            `;
             
             document.getElementById('results').style.display = 'block';
         });
