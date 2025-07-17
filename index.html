@@ -14,7 +14,22 @@
             --positive: #4CAF50;
             --negative: #F44336;
             --info: #2196F3;
+            --header-text: white;
         }
+
+        .dark-theme {
+            --primary: #B71C1C;
+            --secondary: #7F0000;
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #e0e0e0;
+            --highlight: #424242;
+            --positive: #388E3C;
+            --negative: #D32F2F;
+            --info: #1976D2;
+            --header-text: #ffffff;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -33,6 +48,7 @@
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            transition: background 0.3s, color 0.3s;
         }
         .container {
             max-width: 100%;
@@ -40,15 +56,17 @@
             display: flex;
             flex-direction: column;
             background: var(--card);
+            transition: background 0.3s;
         }
         .header {
             background: var(--primary);
-            color: white;
+            color: var(--header-text);
             padding: 12px 15px;
             text-align: center;
             font-weight: 600;
             font-size: 17px;
             position: relative;
+            transition: background 0.3s;
         }
         .clear-btn {
             position: absolute;
@@ -57,20 +75,39 @@
             transform: translateY(-50%);
             background: rgba(255,255,255,0.2);
             border: none;
-            color: white;
+            color: var(--header-text);
             padding: 5px 10px;
             border-radius: 4px;
             font-size: 13px;
             cursor: pointer;
         }
+        .theme-toggle {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: var(--header-text);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 24px;
+        }
         .match-info {
             background: var(--secondary);
             padding: 10px 15px;
+            transition: background 0.3s;
         }
         .match-teams {
             display: flex;
             justify-content: space-between;
-            color: white;
+            color: var(--header-text);
             font-size: 15px;
             margin-bottom: 5px;
         }
@@ -105,6 +142,12 @@
             font-size: 15px;
             background: #f9f9f9;
             caret-color: transparent;
+            transition: background 0.3s, border 0.3s, color 0.3s;
+        }
+        .dark-theme .custom-input {
+            background: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
         }
         .custom-input:focus {
             outline: none;
@@ -126,6 +169,11 @@
             padding: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             border: 1px solid #eee;
+            transition: background 0.3s, border 0.3s;
+        }
+        .dark-theme .market-card {
+            border-color: #333;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
         .market-card.highlight {
             background-color: var(--highlight);
@@ -136,6 +184,9 @@
             margin-bottom: 8px;
             font-size: 13px;
             color: #666;
+        }
+        .dark-theme .market-name {
+            color: #aaa;
         }
         .btn-group {
             display: grid;
@@ -152,6 +203,7 @@
             background: var(--primary);
             color: white;
             cursor: pointer;
+            transition: background 0.3s;
         }
         .btn-secondary {
             background: #757575;
@@ -162,6 +214,10 @@
             padding: 12px;
             margin-top: 10px;
             border-left: 4px solid var(--primary);
+            transition: background 0.3s;
+        }
+        .dark-theme .results {
+            background: #252525;
         }
         .result-item {
             margin-bottom: 8px;
@@ -169,6 +225,10 @@
             background: white;
             border-radius: 6px;
             font-size: 14px;
+            transition: background 0.3s;
+        }
+        .dark-theme .result-item {
+            background: #2a2a2a;
         }
         .result-value {
             font-weight: 600;
@@ -191,6 +251,11 @@
             border-top: 1px solid #ddd;
             position: sticky;
             bottom: 0;
+            transition: background 0.3s;
+        }
+        .dark-theme .keyboard {
+            background: #252525;
+            border-color: #333;
         }
         .key {
             background: white;
@@ -201,6 +266,12 @@
             text-align: center;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
+            transition: background 0.3s, border 0.3s;
+        }
+        .dark-theme .key {
+            background: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
         }
         .key-enter {
             background: var(--primary);
@@ -220,6 +291,10 @@
             margin-top: 5px;
             overflow: hidden;
             position: relative;
+            transition: background 0.3s;
+        }
+        .dark-theme .probability-bar {
+            background: #333;
         }
         .probability-fill {
             height: 100%;
@@ -243,6 +318,10 @@
             margin-top: 10px;
             border-radius: 4px;
             font-size: 14px;
+            transition: background 0.3s;
+        }
+        .dark-theme .recommendation {
+            background-color: #1B5E20;
         }
         .ai-insight {
             background-color: #E3F2FD;
@@ -251,6 +330,10 @@
             margin: 10px 0;
             border-radius: 4px;
             font-size: 14px;
+            transition: background 0.3s;
+        }
+        .dark-theme .ai-insight {
+            background-color: #0D47A1;
         }
         .prediction-card {
             background: #FFF3E0;
@@ -259,6 +342,10 @@
             margin: 10px 0;
             border-radius: 4px;
             font-size: 14px;
+            transition: background 0.3s;
+        }
+        .dark-theme .prediction-card {
+            background: #5D4037;
         }
         .value-badge {
             display: inline-block;
@@ -277,10 +364,27 @@
 <body>
     <div class="container">
         <div class="header">
+            <button class="theme-toggle" id="theme-toggle">
+                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
             AI Анализатор ставок TT PRO v2.0
             <button class="clear-btn" id="clear-btn">Сброс</button>
         </div>
         
+        <!-- Остальной код остается без изменений -->
         <div class="match-info">
             <div class="match-teams">
                 <span id="team1-name">Игрок 1</span>
@@ -391,6 +495,42 @@
         // Защита от масштабирования
         document.addEventListener('gesturestart', e => e.preventDefault());
         document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+
+        // Управление темой
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const body = document.body;
+
+        // Проверка сохраненной темы
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            enableDarkTheme();
+        } else {
+            enableLightTheme();
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('dark-theme')) {
+                enableLightTheme();
+                localStorage.setItem('theme', 'light');
+            } else {
+                enableDarkTheme();
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        function enableDarkTheme() {
+            body.classList.add('dark-theme');
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        }
+
+        function enableLightTheme() {
+            body.classList.remove('dark-theme');
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        }
 
         // Управление вводом
         const inputs = document.querySelectorAll('.custom-input');
